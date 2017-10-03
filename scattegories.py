@@ -27,9 +27,9 @@ class game:
 	def __init__(self,timer=120,ncat=12,mem=3):
 		self.timer = timer
 		self.ncat  = ncat
-		self.mem_l = [""]*mem
-		self.mem_c = [[]]*mem
-		self.ms    = mem
+		self.mem_l = []
+		self.mem_c = []
+		self.mem    = mem
 		self.read_list()
 		self.debug = 0
 		self.quit_commands = ["q","quit","exit","end"]
@@ -42,42 +42,20 @@ class game:
 					if "#" not in line and line.strip():
 						self.list.append(line.strip())
 	def start_round(self,rn):
-		loop = True
-		cat = [""]*self.ncat
-		for i in range(self.ncat):
-			if self.debug:
-				print i,
-			j = 0
-			loop = True
-			while loop:
-				c = choice(self.list)
-				if c not in cat and c not in [[]+m for m in self.mem_c]:
-					cat[i] = c
-					loop = False
-				else:
-					if self.debug:
-						print "!"
-					j = j+1
-				if j > 100:
-					break
 		if self.debug:
-			print j,
-		loop = True
-		while loop:
-			l = choice(letters)
-			if l not in self.mem_l:
-				loop = False
+			print len(self.mem_l),len(self.mem_c)
+		if not self.mem_l:
+			self.mem_l = sample(letters,self.mem)
+			self.mem_c = sample(self.list,self.mem*self.ncat)
+		letter = self.mem_l.pop()
+		categories = [self.mem_c.pop() for i in range(self.ncat)]
 		if self.debug:
-			print l
+			print letter
 			t = "{}\n"*12
-			print t.format(*cat)
+			print t.format(*categories)
 		else:	
-			r = round(self.timer,l,cat,rn)
+			r = round(self.timer,letter,categories,rn)
 			r.play()
-			self.mem_l = [l] + self.mem_l
-			self.mem_l = self.mem_l[:-1]
-			self.mem_c = cat + self.mem_c
-			self.mem_c = self.mem_c[:-1]
 	def play_game(self):
 		os.system("clear")
 		print "openScat v 0.1.0"
@@ -112,7 +90,7 @@ class round:
 		print ttext.format(self.timer),
 		T_0 = time.time()
 		while time.time() - T_0 < self.timer:
-			print ttext.format(int(self.timer + T_0 - time.time())),
+			print ttext.format(str(int(self.timer + T_0 - time.time()))+"    "),
 		print " "
 		os.system("clear")
 		print rtext.format(self.n,self.letter,ht,ht,ht,ht,ht,ht,ht,ht,ht,ht,ht,ht,ht,ht)
